@@ -9,6 +9,10 @@ The selected RRDN generators reconstruct 4x high-resolution, single-channel sate
 1. RRDN trained with composite SSIM alpha 0.8.
 2. RRDN-GAN generator trained with a BatchNorm discriminator.
 
+Each generator is released as both a weights-only `.weights.h5` checkpoint and a complete `.keras` model. The HPC training environment did not support the newer Keras model format, so `.weights.h5` is the original training artifact. The equivalent `.keras` export is provided for convenient architecture-plus-weights loading and prediction.
+
+The `.keras` files contain the Functional generator graph and weights, but not normalization statistics, optimizer state, compiled losses or metrics, training history, datasets, or the GAN discriminator. Kelvin-space inference requires the companion normalization metadata and repository loader.
+
 ## Inputs and outputs
 
 - Input: normalized one-channel low-resolution brightness temperature field.

@@ -24,8 +24,13 @@ training:
 
 weights:
   format: keras_weights_hdf5
-  filename: RRDN_GAN_9RRDB_3RDB_5conv_g64_bs8_glr1e-05_dlr1e-05_adv1e-04_GENERATOR_BEST.weights.h5
+  filename: bt-sr-rrdn-gan-9rrdb-bn-generator-v0.1.0.weights.h5
   sha256: fb0cbd5de70f48e6957e225a0e37c96224d27d14c7b5e2c1e685e312ffecffd9
+
+keras_model:
+  format: keras_v3
+  filename: bt-sr-rrdn-gan-9rrdb-bn-generator-v0.1.0.keras
+  sha256: 2d267ad1984fe170cd0b57f1d0a223b4ec5cae9a0ed17355f2664584987edab9
 
 normalization:
   stats_file: metadata/unified_global_stats.npz

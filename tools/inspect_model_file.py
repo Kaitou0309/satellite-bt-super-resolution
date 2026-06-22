@@ -9,9 +9,8 @@ import h5py
 
 
 DEFAULT_PATH = Path(
-    "rrdn_gan_checkpoints/with_batchnorm/"
-    "RRDN_GAN_9RRDB_3RDB_5conv_g64_bs8_glr1e-05_dlr1e-05_"
-    "adv1e-04_GENERATOR_BEST.weights.h5"
+    "release_assets/"
+    "bt-sr-rrdn-gan-9rrdb-bn-generator-v0.1.0.weights.h5"
 )
 
 

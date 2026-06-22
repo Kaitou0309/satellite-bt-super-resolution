@@ -25,7 +25,7 @@ SOURCE_ROOT = REPOSITORY_ROOT / "src"
 if str(SOURCE_ROOT) not in sys.path:
     sys.path.insert(0, str(SOURCE_ROOT))
 
-from bt_super_resolution import load_generator
+from bt_super_resolution import load_generator, load_keras_generator
 
 
 DEFAULT_CONFIGS = (
@@ -42,6 +42,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hr-key", default="H/bt")
     parser.add_argument("--config", action="append", type=Path)
     parser.add_argument("--weights", action="append", type=Path)
+    parser.add_argument("--keras-model", action="append", type=Path)
+    parser.add_argument(
+        "--artifact-format",
+        choices=("weights", "keras"),
+        default="weights",
+        help="Evaluate reconstructed .weights.h5 checkpoints or complete .keras models.",
+    )
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--output", type=Path, default=Path("metrics.csv"))
     parser.add_argument("--plot-output", type=Path, help="Defaults to <output stem>_matrix.png.")
@@ -196,13 +203,26 @@ def main() -> None:
 
     configs = args.config or list(DEFAULT_CONFIGS)
     weights = args.weights or []
+    keras_models = args.keras_model or []
     if weights and len(weights) != len(configs):
         raise ValueError("Provide one --weights value for every --config, or omit --weights.")
+    if keras_models and len(keras_models) != len(configs):
+        raise ValueError("Provide one --keras-model value for every --config, or omit --keras-model.")
+    if args.artifact_format == "weights" and keras_models:
+        raise ValueError("--keras-model requires --artifact-format keras.")
+    if args.artifact_format == "keras" and weights:
+        raise ValueError("--weights cannot be used with --artifact-format keras.")
 
     rows = []
     for config_index, config in enumerate(configs):
         try:
-            bundle = load_generator(config, weights_path=weights[config_index] if weights else None)
+            if args.artifact_format == "keras":
+                bundle = load_keras_generator(
+                    config,
+                    model_path=keras_models[config_index] if keras_models else None,
+                )
+            else:
+                bundle = load_generator(config, weights_path=weights[config_index] if weights else None)
         except (FileNotFoundError, ValueError) as error:
             if args.strict:
                 raise
@@ -210,7 +230,7 @@ def main() -> None:
             continue
 
         accumulator = MetricAccumulator(data_range=data_range)
-        print(f"\nEvaluating {bundle.name}")
+        print(f"\nEvaluating {bundle.name} from {args.artifact_format}")
         for file_index, path in enumerate(files, start=1):
             try:
                 lr, hr = read_pair(path, args.lr_key, args.hr_key)

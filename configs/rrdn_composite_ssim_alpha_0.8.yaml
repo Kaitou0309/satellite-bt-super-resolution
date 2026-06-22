@@ -22,8 +22,13 @@ training:
 
 weights:
   format: keras_weights_hdf5
-  filename: RRDN_9RRDB_3RDB_5convlayer_g64_UNI_COMPOSITE_SSIM_ALPHA0.8_bs8_lr5e-05_loss_fncomposite_ssim_alpha0.8_BEST.h5
-  sha256: 4601d014f94e5a9caeff4f376a43d7b0a66bdd82b896ae37bdfb5cee045cd171
+  filename: bt-sr-rrdn-9rrdb-composite-ssim-a08-v0.1.0.weights.h5
+  sha256: 3f79ab47c0b9bd13a4d12f778a6dae124b297735c16aa5fe39a09cdcb278e782
+
+keras_model:
+  format: keras_v3
+  filename: bt-sr-rrdn-9rrdb-composite-ssim-a08-v0.1.0.keras
+  sha256: 0c38e38080d79ee0019c0fb3d92c2fa46032d22891e69bf38f86dafec6a68e6c
 
 normalization:
   stats_file: metadata/unified_global_stats.npz

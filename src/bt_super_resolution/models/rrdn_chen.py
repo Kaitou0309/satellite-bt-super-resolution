@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Conv2D, ReLU, Add, Concatenate, Lambda, UpSampling2D
+from tensorflow.keras.layers import Input, Conv2D, ReLU, Add, Concatenate, Rescaling, UpSampling2D
 from tensorflow.keras.models import Model
 from .rdn_chen import RDB, pixel_shuffle_block
 
@@ -21,8 +21,8 @@ def RRDB_block(x, n_rdb=3, n_layers=3, growth_rate=32, name='RRDB'):
     # Scale the output of the RRDB block
     # Math logic: y = x + beta * F(x) where beta is typically 0.2 to stabilize training
     # F(x) is the transformation learned by the RRDB block
-    # Here we use a Lambda layer to scale the tensor
-    x = Lambda(lambda t: t * 0.2)(x)
+    # Rescaling is equivalent to x * 0.2 and serializes safely in .keras exports.
+    x = Rescaling(0.2)(x)
 
     # Add the original input back to the output of the RRDB block
     # We return y = x + beta * F(x) 

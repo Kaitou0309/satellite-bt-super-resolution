@@ -7,6 +7,7 @@ from typing import Any
 
 import numpy as np
 from tensorflow.keras import Model
+from tensorflow.keras.models import load_model
 
 from .config import find_repository_root, load_model_config
 from .models import build_rrdn
@@ -74,6 +75,22 @@ def _resolve_weights_path(config: dict[str, Any], repository_root: Path, overrid
     return (repository_root / "release_assets" / filename).resolve()
 
 
+def _resolve_keras_model_path(
+    config: dict[str, Any], repository_root: Path, override: str | Path | None
+) -> Path:
+    if override is not None:
+        path = Path(override).expanduser()
+        return path.resolve() if path.is_absolute() else (repository_root / path).resolve()
+
+    filename = str(config.get("keras_model", {}).get("filename", ""))
+    if not filename or filename.startswith("TODO"):
+        raise FileNotFoundError(
+            f"No full Keras model is configured for {config['name']}. "
+            "Pass model_path explicitly after staging the model artifact."
+        )
+    return (repository_root / "release_assets" / filename).resolve()
+
+
 def _verify_sha256(path: Path, expected: str | None) -> None:
     if not expected or expected.startswith("TODO"):
         return
@@ -127,5 +144,39 @@ def load_generator(
         config=config,
         config_path=config_path,
         weights_path=resolved_weights,
+        normalization=load_normalization_stats(stats_path),
+    )
+
+
+def load_keras_generator(
+    config_path: str | Path,
+    *,
+    model_path: str | Path | None = None,
+    repository_root: str | Path | None = None,
+    verify_checksum: bool = True,
+) -> ModelBundle:
+    """Load a complete released ``.keras`` generator with its normalization metadata."""
+
+    config_path = Path(config_path).expanduser().resolve()
+    config = load_model_config(config_path)
+    root = Path(repository_root).expanduser().resolve() if repository_root else find_repository_root(config_path)
+    resolved_model = _resolve_keras_model_path(config, root, model_path)
+    if not resolved_model.is_file():
+        raise FileNotFoundError(f"Full Keras model not found: {resolved_model}")
+    if verify_checksum:
+        _verify_sha256(resolved_model, config.get("keras_model", {}).get("sha256"))
+
+    stats_value = config.get("normalization", {}).get("stats_file")
+    if not stats_value:
+        raise ValueError(f"No normalization.stats_file is configured in {config_path}")
+    stats_path = Path(stats_value).expanduser()
+    if not stats_path.is_absolute():
+        stats_path = root / stats_path
+
+    return ModelBundle(
+        model=load_model(resolved_model, compile=False),
+        config=config,
+        config_path=config_path,
+        weights_path=resolved_model,
         normalization=load_normalization_stats(stats_path),
     )

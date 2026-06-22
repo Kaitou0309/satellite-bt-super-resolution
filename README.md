@@ -71,18 +71,33 @@ python -m pip install -e ".[dev]"
 python -m pytest -m "not release"
 ```
 
-## Model checkpoints
+## Model files
 
-The two weights-only HDF5 checkpoints are distributed separately from Git source. Their expected filenames and SHA-256 checksums are recorded in `configs/` and `release_assets/SHA256SUMS.txt`.
+Each selected generator is distributed in two formats through GitHub Releases. Training was performed on an HPC environment that did not support saving the newer `.keras` format, so the original selected checkpoints were saved as weights-only `.weights.h5` files. Those validated checkpoints are preserved for architecture reconstruction, fine-tuning, and HPC compatibility. Equivalent `.keras` files are exported afterward for easier loading and prediction.
+
+The expected filenames and SHA-256 checksums are recorded in `configs/` and `release_assets/SHA256SUMS.txt`.
 
 Place downloaded files under `release_assets/`:
 
 ```text
-release_assets/RRDN_9RRDB_3RDB_5convlayer_g64_UNI_COMPOSITE_SSIM_ALPHA0.8_bs8_lr5e-05_loss_fncomposite_ssim_alpha0.8_BEST.h5
-release_assets/RRDN_GAN_9RRDB_3RDB_5conv_g64_bs8_glr1e-05_dlr1e-05_adv1e-04_GENERATOR_BEST.weights.h5
+release_assets/bt-sr-rrdn-9rrdb-composite-ssim-a08-v0.1.0.weights.h5
+release_assets/bt-sr-rrdn-9rrdb-composite-ssim-a08-v0.1.0.keras
+release_assets/bt-sr-rrdn-gan-9rrdb-bn-generator-v0.1.0.weights.h5
+release_assets/bt-sr-rrdn-gan-9rrdb-bn-generator-v0.1.0.keras
 ```
 
 <!-- TODO: Replace with links to the first versioned GitHub Release. -->
+
+### What the `.keras` files contain
+
+Both converted artifacts were inspected as Keras v3 archives and reloaded without custom objects. Each contains:
+
+- The complete Functional generator architecture: 484 serialized standard Keras layers.
+- All generator weights in the archive's internal `model.weights.h5`.
+- Input/output graph configuration, layer names, shapes, and activations.
+- Keras serialization metadata, including the Keras version and save date.
+
+The exports have an empty compile configuration because they are inference-focused generator releases. Compared with a compiled training-oriented `.keras` checkpoint, they do not contain an optimizer or optimizer state, training loss, compiled metrics, or custom training objectives. They also do not contain the external Kelvin normalization statistics, YAML experiment metadata, GAN discriminator, dataset, training history, model card, or evaluation outputs. Those companion artifacts remain in the repository. A `.keras` file does not automatically package external preprocessing unless that preprocessing is built into the model graph.
 
 ## Python inference
 
@@ -94,6 +109,28 @@ prediction_kelvin = bundle.predict_kelvin(lr_bt, batch_size=8)
 ```
 
 The loader reconstructs the exact architecture, verifies the checkpoint checksum, loads the required normalization statistics, and returns predictions in Kelvin.
+
+For Kelvin-aware inference from a complete Keras artifact, use the repository loader:
+
+```python
+from bt_super_resolution import load_keras_generator
+
+bundle = load_keras_generator("configs/rrdn_composite_ssim_alpha_0.8.yaml")
+prediction_kelvin = bundle.predict_kelvin(lr_bt, batch_size=8)
+```
+
+For direct normalized-input Keras loading:
+
+```python
+import tensorflow as tf
+
+model = tf.keras.models.load_model(
+    "release_assets/bt-sr-rrdn-9rrdb-composite-ssim-a08-v0.1.0.keras",
+    compile=False,
+)
+```
+
+The full model expects normalized LR input and returns normalized HR output. Use the repository loader when Kelvin-aware normalization and denormalization are required.
 
 ## HDF5 prediction
 
@@ -110,6 +147,18 @@ python scripts/inference/make_prediction.py \
 
 The same command accepts a directory and recursively processes every `.h5` or `.hdf5` file.
 
+Use the complete `.keras` models instead of reconstructed weights:
+
+```bash
+python scripts/inference/make_prediction.py \
+    --input sample_data/amsr2_example.h5 \
+    --output outputs/example_keras_predictions.h5 \
+    --artifact-format keras \
+    --batch-size 1 \
+    --overwrite \
+    --strict
+```
+
 ## Evaluation and plots
 
 ```bash
@@ -123,6 +172,26 @@ python scripts/evaluation/plot_predictions.py \
     --input outputs/example_with_predictions.h5 \
     --output-dir outputs/prediction_plots \
     --overwrite \
+    --strict
+```
+
+Generate prediction and residual panels directly from the `.keras` models:
+
+```bash
+python scripts/evaluation/plot_selected_model_residuals.py \
+    --input sample_data/amsr2_example.h5 \
+    --artifact-format keras \
+    --output-dir outputs/keras_residual_plots \
+    --strict
+```
+
+Evaluate the complete `.keras` release artifacts with the same normalization and metrics:
+
+```bash
+python scripts/evaluation/metrics.py \
+    --data sample_data/amsr2_example.h5 \
+    --artifact-format keras \
+    --output outputs/example_keras_metrics.csv \
     --strict
 ```
 

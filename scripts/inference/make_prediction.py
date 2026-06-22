@@ -18,7 +18,7 @@ SOURCE_ROOT = REPOSITORY_ROOT / "src"
 if str(SOURCE_ROOT) not in sys.path:
     sys.path.insert(0, str(SOURCE_ROOT))
 
-from bt_super_resolution import load_generator
+from bt_super_resolution import load_generator, load_keras_generator
 
 
 DEFAULT_CONFIGS = (
@@ -34,6 +34,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", required=True, type=Path, help="Output HDF5 file or directory.")
     parser.add_argument("--config", action="append", type=Path, help="Model YAML; repeat for multiple models.")
     parser.add_argument("--weights", action="append", type=Path, help="Checkpoint matching each --config.")
+    parser.add_argument("--keras-model", action="append", type=Path, help="Full model matching each --config.")
+    parser.add_argument(
+        "--artifact-format",
+        choices=("weights", "keras"),
+        default="weights",
+        help="Use reconstructed .weights.h5 checkpoints or complete .keras models.",
+    )
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--strict", action="store_true", help="Stop if a model artifact is unavailable.")
@@ -66,12 +73,27 @@ def safe_name(name: str) -> str:
 def load_bundles(args: argparse.Namespace):
     configs = args.config or list(DEFAULT_CONFIGS)
     weights = args.weights or []
+    keras_models = args.keras_model or []
     if weights and len(weights) != len(configs):
         raise ValueError("Provide one --weights value for every --config, or omit --weights.")
+    if keras_models and len(keras_models) != len(configs):
+        raise ValueError("Provide one --keras-model value for every --config, or omit --keras-model.")
+    if args.artifact_format == "weights" and keras_models:
+        raise ValueError("--keras-model requires --artifact-format keras.")
+    if args.artifact_format == "keras" and weights:
+        raise ValueError("--weights cannot be used with --artifact-format keras.")
     bundles = []
     for index, config in enumerate(configs):
         try:
-            bundles.append(load_generator(config, weights_path=weights[index] if weights else None))
+            if args.artifact_format == "keras":
+                bundles.append(
+                    load_keras_generator(
+                        config,
+                        model_path=keras_models[index] if keras_models else None,
+                    )
+                )
+            else:
+                bundles.append(load_generator(config, weights_path=weights[index] if weights else None))
         except (FileNotFoundError, ValueError) as error:
             if args.strict:
                 raise
@@ -109,7 +131,12 @@ def main() -> None:
                 dataset = group.create_dataset("bt", data=prediction, compression="gzip")
                 dataset.attrs["model_config"] = str(bundle.config_path)
                 dataset.attrs["model_name"] = bundle.name
-                dataset.attrs["weights_file"] = bundle.weights_path.name
+                dataset.attrs["artifact_file"] = bundle.weights_path.name
+                dataset.attrs["artifact_format"] = args.artifact_format
+                if args.artifact_format == "weights":
+                    dataset.attrs["weights_file"] = bundle.weights_path.name
+                else:
+                    dataset.attrs["keras_model_file"] = bundle.weights_path.name
                 dataset.attrs["units"] = "K"
                 print(f"Wrote {destination}:{group.name}/bt {prediction.shape}")
 
