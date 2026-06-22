@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local environments and editor files
+.DS_Store
+.idea/
+.vscode/
+
+# Research data and generated outputs
+*.h5
+*.hdf5
+*.keras
+*.weights.h5
+*.npy
+*.out
+*.err
+cache_preds/
+checkpoints/
+logs/
+outputs/
+
+# Keep only the compact public example HDF5 file.
+!sample_data/
+!sample_data/amsr2_example.h5
+
+# Release binaries are uploaded through GitHub Releases, not Git history.
+release_assets/*
+!release_assets/README.md
+!release_assets/SHA256SUMS.txt
+
+# Keep the small normalization metadata required for inference.
+!metadata/unified_global_stats.npz

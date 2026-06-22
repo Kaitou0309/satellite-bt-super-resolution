@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "satellite-bt-super-resolution"
+version = "0.1.0"
+description = "Inference and evaluation utilities for satellite brightness-temperature super-resolution models."
+readme = "README.md"
+license = "Apache-2.0"
+authors = [{ name = "Kongkun Chen" }]
+requires-python = ">=3.10"
+dependencies = [
+    "h5py",
+    "matplotlib",
+    "numpy",
+    "PyYAML",
+    "scikit-image",
+    "tensorflow>=2.12",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

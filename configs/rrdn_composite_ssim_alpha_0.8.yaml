@@ -1,0 +1,29 @@
+name: rrdn_composite_ssim_alpha_0.8
+display_name: RRDN Composite SSIM (alpha=0.8)
+release_status: selected_for_release
+task: brightness_temperature_super_resolution
+scale: 4
+channels: 1
+
+generator:
+  architecture: rrdn
+  rrdb_blocks: 9
+  rdb_per_rrdb: 3
+  conv_layers_per_rdb: 5
+  filters: 64
+  residual_scaling: 0.2
+  upsampling: bilinear
+
+training:
+  objective: composite_ssim
+  ssim_alpha: 0.8
+  batch_size: 8
+  learning_rate: 5.0e-5
+
+weights:
+  format: keras_weights_hdf5
+  filename: RRDN_9RRDB_3RDB_5convlayer_g64_UNI_COMPOSITE_SSIM_ALPHA0.8_bs8_lr5e-05_loss_fncomposite_ssim_alpha0.8_BEST.h5
+  sha256: 4601d014f94e5a9caeff4f376a43d7b0a66bdd82b896ae37bdfb5cee045cd171
+
+normalization:
+  stats_file: metadata/unified_global_stats.npz

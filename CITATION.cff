@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "Citation information will be finalized with the public software or manuscript release."
+title: "Satellite Brightness Temperature Super-Resolution"
+type: software
+license: Apache-2.0
+authors:
+  - family-names: Chen
+    given-names: Kongkun
+repository-code: "https://github.com/Kaitou0309/satellite-bt-super-resolution"

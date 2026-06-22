@@ -1,0 +1,40 @@
+====================================================================================================
+HDF5 INSPECTION
+====================================================================================================
+Started:       2026-06-22 01:12:13
+Input:         sample_data/amsr2_example.h5
+Log:           sample_data/inspection.log
+Files selected: 1
+  001. sample_data/amsr2_example.h5
+
+====================================================================================================
+FILE: sample_data/amsr2_example.h5
+====================================================================================================
+
+Top-level keys:
+  - H
+  - L
+  attributes:
+    - description: One paired 89 GHz LR/HR scene for software validation, not model training.
+    - source_file: 20260409_031713_032605.h5
+    - spatial_scale: 4
+    - title: AMSR2-derived brightness-temperature super-resolution example
+
+Dataset variables:
+  - H/bt | shape=(384, 400) | dtype=float32
+  - L/bt | shape=(96, 100) | dtype=float32
+
+Prediction shape verification:
+  LR: L/bt shape=(96, 100), spatial=(96, 100)
+  HR: H/bt shape=(384, 400), spatial=(384, 400), scenes=1
+  HR/LR spatial scale: 4 x 4
+  Predictions: group 'model_predictions' not found.
+
+====================================================================================================
+SUMMARY
+====================================================================================================
+Files inspected:      1
+Files failed:         0
+Prediction datasets:  0
+Shape mismatches:     0
+Log written to:       sample_data/inspection.log

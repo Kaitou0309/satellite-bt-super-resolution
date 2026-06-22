@@ -1,0 +1,31 @@
+name: rrdn_gan_with_batchnorm_discriminator
+display_name: RRDN-GAN (BatchNorm discriminator)
+release_status: selected_for_release
+task: brightness_temperature_super_resolution
+scale: 4
+channels: 1
+
+generator:
+  architecture: rrdn
+  rrdb_blocks: 9
+  rdb_per_rrdb: 3
+  conv_layers_per_rdb: 5
+  filters: 64
+  residual_scaling: 0.2
+  upsampling: bilinear
+
+training:
+  objective: adversarial
+  discriminator_batchnorm: true
+  generator_learning_rate: 1.0e-5
+  discriminator_learning_rate: 1.0e-5
+  adversarial_weight: 1.0e-4
+  batch_size: 8
+
+weights:
+  format: keras_weights_hdf5
+  filename: RRDN_GAN_9RRDB_3RDB_5conv_g64_bs8_glr1e-05_dlr1e-05_adv1e-04_GENERATOR_BEST.weights.h5
+  sha256: fb0cbd5de70f48e6957e225a0e37c96224d27d14c7b5e2c1e685e312ffecffd9
+
+normalization:
+  stats_file: metadata/unified_global_stats.npz

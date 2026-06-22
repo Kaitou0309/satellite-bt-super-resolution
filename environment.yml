@@ -1,0 +1,17 @@
+name: bt-super-resolution
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - numpy=1.26.4
+  - h5py=3.14.0
+  - pandas=2.3.0
+  - matplotlib=3.10.3
+  - scikit-learn=1.7.0
+  - scikit-image=0.22.0
+  - pyyaml=6.0.2
+  - pytest
+  - pip
+  - pip:
+      - tensorflow==2.20.0
+      - -e .
