@@ -21,9 +21,11 @@ Start here if you mainly want to run the released model on satellite brightness-
 
 - Folder: `beginner_guide/`
 - Notebook: `beginner_guide/notebooks/01_use_pretrained_keras_models.ipynb`
+- Raw ATMS example: `github_case/`
 - Recommended artifact: `.keras`
 - Typical users: applied satellite scientists, NOAA/NASA/research collaborators, meteorology teams, and first-time repository users.
 - Covered workflow: load model, read AMSR2/ATMS/Tomorrow.io-style HDF5 inputs, run prediction, inspect LR and predicted HR output.
+- Use `github_case/` when starting from raw ATMS SDR/GEO swath files rather than prepared model-input HDF5 files.
 
 ### 2. ML-aware model understanding
 
@@ -72,6 +74,7 @@ sample_data/         One compact, full-size LR/HR example
 scripts/evaluation/  Metrics and visualization workflows
 scripts/inference/   HDF5 prediction workflow
 scripts/training/    RRDN training and RRDN-GAN fine-tuning
+github_case/          Raw ATMS SDR/GEO example for map generation
 src/                  Canonical importable Python package
 tests/                Fast tests and optional release-checkpoint tests
 tools/                HDF5, checkpoint, and sample-generation utilities
@@ -192,6 +195,33 @@ python scripts/inference/make_prediction.py \
     --overwrite \
     --strict
 ```
+
+## Raw ATMS GitHub case
+
+The `github_case/` folder is a beginner-facing raw-data example. It is separate from `scripts/inference/make_prediction.py` because it starts one step earlier in the workflow: raw ATMS SDR and geolocation files instead of model-ready HDF5 input.
+
+Use this example when you have paired raw files such as:
+
+```text
+github_case/data/SATMS_j01_d20260415*.h5
+github_case/data/GATMO_j01_d20260415*.h5
+```
+
+Run the example from the repository root:
+
+```bash
+python github_case/atms_example.py
+```
+
+The script reads the SDR brightness-temperature array, applies the ATMS scale factors, extracts channel 16, loads the matching latitude/longitude swath, and writes an original-resolution map such as:
+
+```text
+orig.png
+```
+
+Because `orig.png` is a relative output path, it is saved in the directory where the command is run. If the command is run from the repository root, the file appears at `./orig.png`.
+
+This raw ATMS example is useful for visual inspection and for understanding how ATMS swath data are organized. It is not the same as the model prediction pipeline. To run the released RRDN or RRDN-GAN model, first prepare a model-ready HDF5 file containing a compatible brightness-temperature dataset, then use `scripts/inference/make_prediction.py`.
 
 ## Evaluation and plots
 
