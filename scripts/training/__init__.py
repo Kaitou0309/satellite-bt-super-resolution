@@ -1,1 +1,1 @@
-"""Public RRDN and RRDN-GAN training entry points."""
+"""Public MW-SR and MW-SR-GAN training entry points."""

@@ -22,7 +22,7 @@ if str(EVALUATION_ROOT) not in sys.path:
     sys.path.insert(0, str(EVALUATION_ROOT))
 
 from bt_super_resolution import load_generator, load_keras_generator
-from geo_plotting import load_coordinates
+from geo_plotting import load_coordinates, normalization_note
 
 
 DEFAULT_CONFIGS = (
@@ -153,6 +153,7 @@ def main() -> None:
                         print(f"Keeping existing {destination}:{group.name}/bt")
                         continue
                     del group["bt"]
+                print(f"{bundle.name}: {normalization_note(bundle.normalization.path)}")
                 prediction = bundle.predict_kelvin(lr, batch_size=args.batch_size)
                 dataset = group.create_dataset("bt", data=prediction, compression="gzip")
                 dataset.attrs["model_config"] = str(bundle.config_path)
@@ -160,11 +161,23 @@ def main() -> None:
                 dataset.attrs["artifact_file"] = bundle.weights_path.name
                 dataset.attrs["artifact_format"] = args.artifact_format
                 dataset.attrs["geolocation_preserved_from_source"] = bool(geolocation_available)
+                dataset.attrs["normalization_stats"] = str(bundle.normalization.path)
+                dataset.attrs["normalization_mu_x"] = float(bundle.normalization.mu_x)
+                dataset.attrs["normalization_sd_x"] = float(bundle.normalization.sd_x)
+                dataset.attrs["normalization_mu_y"] = float(bundle.normalization.mu_y)
+                dataset.attrs["normalization_sd_y"] = float(bundle.normalization.sd_y)
+                dataset.attrs["inference_transform"] = "normalize LR with training stats; denormalize SR to Kelvin"
                 if args.artifact_format == "weights":
                     dataset.attrs["weights_file"] = bundle.weights_path.name
                 else:
                     dataset.attrs["keras_model_file"] = bundle.weights_path.name
                 dataset.attrs["units"] = "K"
+                group.attrs["model_name"] = bundle.name
+                group.attrs["artifact_format"] = args.artifact_format
+                group.attrs["artifact_file"] = bundle.weights_path.name
+                group.attrs["normalization_stats"] = str(bundle.normalization.path)
+                group.attrs["prediction_units"] = "K"
+                group.attrs["inference_transform"] = "normalize LR with training stats; denormalize SR to Kelvin"
                 print(f"Wrote {destination}:{group.name}/bt {prediction.shape}")
 
 

@@ -1,5 +1,5 @@
 name: rrdn_gan_with_batchnorm_discriminator
-display_name: RRDN-GAN (BatchNorm discriminator)
+display_name: MW-SR-GAN
 release_status: selected_for_release
 task: brightness_temperature_super_resolution
 scale: 4

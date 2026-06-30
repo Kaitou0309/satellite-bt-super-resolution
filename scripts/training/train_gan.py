@@ -183,7 +183,7 @@ def main():
     )
 
     print("=" * 80)
-    print(f"🚀 Starting RRDN-GAN fine-tuning: {run_tag}")
+    print(f"🚀 Starting MW-SR-GAN fine-tuning: {run_tag}")
     print("=" * 80)
 
     # ------------------------------------------------

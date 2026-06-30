@@ -2,12 +2,12 @@
 
 ## Intended use
 
-The selected RRDN generators reconstruct 4x high-resolution, single-channel satellite microwave brightness temperature fields from normalized low-resolution inputs.
+The selected MW-SR generators reconstruct 4x high-resolution, single-channel satellite microwave brightness temperature fields from normalized low-resolution inputs.
 
 ## Released models
 
-1. RRDN trained with composite SSIM alpha 0.8.
-2. RRDN-GAN generator trained with a BatchNorm discriminator.
+1. MW-SR: an RRDN generator trained with composite SSIM alpha 0.8.
+2. MW-SR-GAN: the MW-SR generator refined with adversarial training using a BatchNorm discriminator.
 
 Each generator is released as both a weights-only `.weights.h5` checkpoint and a complete `.keras` model. The HPC training environment did not support the newer Keras model format, so `.weights.h5` is the original training artifact. The equivalent `.keras` export is provided for convenient architecture-plus-weights loading and prediction.
 

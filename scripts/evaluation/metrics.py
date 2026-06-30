@@ -19,6 +19,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 from skimage.metrics import structural_similarity
+from geo_plotting import add_figure_note, normalization_note
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 SOURCE_ROOT = REPOSITORY_ROOT / "src"
@@ -33,6 +34,7 @@ DEFAULT_CONFIGS = (
     REPOSITORY_ROOT / "configs/rrdn_gan_batchnorm.yaml",
 )
 METRIC_COLUMNS = ("RMSE", "Global PSNR", "SSIM", "Bias", "Latency (ms/scene)")
+METADATA_COLUMNS = ("Artifact Format", "Normalization Stats", "Prediction Units", "Inference Transform")
 
 
 def parse_args() -> argparse.Namespace:
@@ -189,6 +191,10 @@ def save_matrix_plot(rows: list[dict[str, float]], path: Path, file_count: int, 
         fontweight="bold",
         pad=18,
     )
+    add_figure_note(
+        figure,
+        "Metrics are computed in Kelvin after normalized LR inference and denormalized SR output.",
+    )
     path.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(path, dpi=300, bbox_inches="tight")
     plt.close(figure)
@@ -231,6 +237,7 @@ def main() -> None:
 
         accumulator = MetricAccumulator(data_range=data_range)
         print(f"\nEvaluating {bundle.name} from {args.artifact_format}")
+        print(f"  {normalization_note(bundle.normalization.path)}")
         for file_index, path in enumerate(files, start=1):
             try:
                 lr, hr = read_pair(path, args.lr_key, args.hr_key)
@@ -244,7 +251,14 @@ def main() -> None:
                 print(f"  Skipping {path}: {error}")
 
         metrics = accumulator.finalize()
-        row = {"Model": bundle.name, **metrics}
+        row = {
+            "Model": bundle.name,
+            "Artifact Format": args.artifact_format,
+            "Normalization Stats": str(bundle.normalization.path),
+            "Prediction Units": "Kelvin",
+            "Inference Transform": "normalize LR with training stats; denormalize SR to Kelvin",
+            **metrics,
+        }
         rows.append(row)
         print(f"Completed {bundle.name}: {accumulator.file_count}/{len(files)} files, {accumulator.scene_count} scenes")
         print(row)
@@ -254,7 +268,7 @@ def main() -> None:
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("w", newline="", encoding="utf-8") as stream:
-        writer = csv.DictWriter(stream, fieldnames=("Model", *METRIC_COLUMNS))
+        writer = csv.DictWriter(stream, fieldnames=("Model", *METADATA_COLUMNS, *METRIC_COLUMNS))
         writer.writeheader()
         writer.writerows(rows)
 

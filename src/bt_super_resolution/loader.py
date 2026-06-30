@@ -1,4 +1,4 @@
-"""Config-driven loading for RRDN and RRDN-GAN generator releases."""
+"""Config-driven loading for MW-SR and MW-SR-GAN generator releases."""
 
 from dataclasses import dataclass
 from hashlib import sha256
@@ -110,9 +110,9 @@ def load_generator(
     repository_root: str | Path | None = None,
     verify_checksum: bool = True,
 ) -> ModelBundle:
-    """Load an RRDN or RRDN-GAN generator from its release config and weights.
+    """Load an MW-SR or MW-SR-GAN generator from its release config and weights.
 
-    RRDN-GAN uses the same generator topology. Batch normalization is a
+    MW-SR-GAN uses the same generator topology. Batch normalization is a
     discriminator training option and is therefore not added to the generator.
     """
 

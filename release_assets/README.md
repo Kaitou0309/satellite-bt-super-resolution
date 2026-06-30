@@ -4,8 +4,8 @@ This directory is for local review of model binaries before they are uploaded to
 
 ## Selected release models
 
-- RRDN composite-SSIM alpha 0.8, 9 RRDB blocks, 3 RDBs per RRDB, 5 convolutional layers per RDB, 64 filters.
-- RRDN-GAN generator trained with the BatchNorm discriminator.
+- MW-SR: RRDN composite-SSIM alpha 0.8, 9 RRDB blocks, 3 RDBs per RRDB, 5 convolutional layers per RDB, 64 filters.
+- MW-SR-GAN: MW-SR generator refined with adversarial training using the BatchNorm discriminator.
 
 The HPC training environment did not support the newer `.keras` format, so both selected models were originally stored as weights-only `.weights.h5` checkpoints. Keep those original checkpoints for reproducible architecture reconstruction, fine-tuning, and HPC compatibility. The corresponding `.keras` exports package each generator architecture with its weights for easier loading and prediction. Discriminator weights are not required for inference.
 
@@ -29,7 +29,7 @@ gh release create v0.1.0 \
     release_assets/*.keras \
     release_assets/SHA256SUMS.txt \
     --title "v0.1.0 - Initial model release" \
-    --notes "Pretrained RRDN Composite SSIM and RRDN-GAN generators in weights-only and complete Keras formats."
+    --notes "Pretrained MW-SR and MW-SR-GAN generators in weights-only and complete Keras formats."
 ```
 
 If `v0.1.0` already exists, upload or replace its model assets:

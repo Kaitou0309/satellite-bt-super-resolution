@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 
-from geo_plotting import load_coordinates, plot_bt_panel
+from geo_plotting import add_figure_note, load_coordinates, normalization_note, plot_bt_panel
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 SOURCE_ROOT = REPOSITORY_ROOT / "src"
@@ -97,6 +97,7 @@ def main() -> None:
             print(f"Skipping {config}: {error}")
     if not bundles:
         raise RuntimeError("No model could be loaded.")
+    inference_note = normalization_note(bundles[0].normalization.path)
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     for input_path in args.input:
@@ -130,7 +131,8 @@ def main() -> None:
             fontsize=14,
             fontweight="bold",
         )
-        figure.tight_layout()
+        add_figure_note(figure, inference_note)
+        figure.tight_layout(rect=(0, 0.04, 1, 0.96))
         output = args.output_dir / f"{input_path.stem}_scene_{args.scene_index}_residuals.png"
         figure.savefig(output, dpi=600, bbox_inches="tight")
         plt.close(figure)

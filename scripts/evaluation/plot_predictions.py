@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from skimage.transform import resize
 
-from geo_plotting import load_coordinates, plot_bt_panel
+from geo_plotting import SAVED_PREDICTION_NOTE, add_figure_note, load_coordinates, plot_bt_panel
 
 
 LR_DATASET_CANDIDATES = ("L/bt", "bt")
@@ -80,6 +80,11 @@ def load_plot_data(path: Path, args: argparse.Namespace):
             label = dataset.attrs.get("model_name", group_name.replace("_", " "))
             if isinstance(label, bytes):
                 label = label.decode("utf-8")
+            units = dataset.attrs.get("units", "")
+            if isinstance(units, bytes):
+                units = units.decode("utf-8")
+            if units and str(units).lower() not in {"k", "kelvin"}:
+                print(f"Warning: {path}:{dataset.name} reports units={units!r}; plots assume Kelvin.")
             predictions.append((str(label), select_scene(dataset[:], args.scene_index)))
 
         target_shape = hr.shape if hr is not None else predictions[0][1].shape if predictions else None
@@ -136,7 +141,8 @@ def plot_with_truth(path: Path, output: Path, lr: np.ndarray, hr: np.ndarray, pr
             figure.colorbar(image, ax=axes[row, column], fraction=0.046, pad=0.04, label="K")
 
     figure.suptitle(f"{path.name}, scene {args.scene_index}", fontsize=15, fontweight="bold")
-    figure.tight_layout()
+    add_figure_note(figure, SAVED_PREDICTION_NOTE)
+    figure.tight_layout(rect=(0, 0.04, 1, 0.96))
     figure.savefig(output, dpi=args.dpi, bbox_inches="tight")
     plt.close(figure)
 
@@ -159,7 +165,8 @@ def plot_without_truth(path: Path, output: Path, lr: np.ndarray, predictions, co
         )
         figure.colorbar(image, ax=axis, fraction=0.046, pad=0.04, label="K")
     figure.suptitle(f"{path.name}, scene {args.scene_index}", fontsize=15, fontweight="bold")
-    figure.tight_layout()
+    add_figure_note(figure, SAVED_PREDICTION_NOTE)
+    figure.tight_layout(rect=(0, 0.04, 1, 0.96))
     figure.savefig(output, dpi=args.dpi, bbox_inches="tight")
     plt.close(figure)
 

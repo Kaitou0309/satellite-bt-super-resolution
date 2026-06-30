@@ -2,12 +2,12 @@
 
 TensorFlow models and reproducible workflows for reconstructing four-times higher-resolution 89 GHz satellite microwave brightness-temperature fields from low-resolution observations.
 
-The project provides two selected RRDN generators:
+The project provides two selected microwave super-resolution generators:
 
 | Model | Generator | Training objective | Status |
 | --- | --- | --- | --- |
-| RRDN Composite SSIM | 9 RRDB, 3 RDB/RRDB, 5 conv/RDB, 64 filters | Composite SSIM, alpha 0.8 | Config and checkpoint validated |
-| RRDN-GAN | Same RRDN generator | Composite reconstruction plus adversarial refinement | Config and checkpoint validated |
+| MW-SR | RRDN generator: 9 RRDB, 3 RDB/RRDB, 5 conv/RDB, 64 filters | Composite SSIM, alpha 0.8 | Config and checkpoint validated |
+| MW-SR-GAN | Same RRDN generator | Composite reconstruction plus adversarial refinement | Config and checkpoint validated |
 
 The GAN discriminator uses Batch Normalization during training. BatchNorm is not part of the released generator and is not needed for inference.
 
@@ -46,7 +46,7 @@ Use this path if you want to reproduce training, fine-tune the released generato
 
 ## Model architecture
 
-### RRDN generator
+### MW-SR generator
 
 ![RRDN generator architecture showing the shallow feature extractor, RRDB trunk, global residual connection, and four-times upsampling head](docs/figures/RRDN_Model_Structure.png)
 
@@ -54,13 +54,13 @@ The generator maps a single-channel low-resolution BT field of shape `H x W x 1`
 
 Residual learning occurs at three levels: inside each RDB, across each RRDB, and across the complete feature trunk. The RRDB residual is scaled by 0.2 before it is added to the identity path, which stabilizes deeper training. The final head uses bilinear 4x upsampling followed by convolutional refinement. Batch Normalization is omitted from the generator to avoid unnecessarily transforming the radiometric feature distribution.
 
-### RRDN-GAN refinement
+### MW-SR-GAN refinement
 
-![RRDN-GAN training architecture showing the pretrained generator, reconstruction objective, patch discriminator, and adversarial objectives](docs/figures/GAN_Model_Architecture.png)
+![MW-SR-GAN training architecture showing the pretrained generator, reconstruction objective, patch discriminator, and adversarial objectives](docs/figures/GAN_Model_Architecture.png)
 
-GAN training begins from the pretrained 9-RRDB Composite SSIM generator rather than an untrained network. The generator continues to optimize a reconstruction objective while receiving adversarial feedback from a deep PatchGAN-style discriminator. Instead of assigning one real/fake score to an entire scene, the discriminator produces a spatial probability map and evaluates local BT patches around features such as cloud edges, storm boundaries, and sharp thermal transitions.
+GAN training begins from the pretrained MW-SR generator rather than an untrained network. The generator continues to optimize a reconstruction objective while receiving adversarial feedback from a deep PatchGAN-style discriminator. Instead of assigning one real/fake score to an entire scene, the discriminator produces a spatial probability map and evaluates local BT patches around features such as cloud edges, storm boundaries, and sharp thermal transitions.
 
-The released GAN generator was trained with the BatchNorm discriminator variant. The discriminator is required only during adversarial training; prediction uses the generator by itself.
+The released MW-SR-GAN generator was trained with the BatchNorm discriminator variant. The discriminator is required only during adversarial training; prediction uses the generator by itself.
 
 ## Repository layout
 
@@ -73,7 +73,7 @@ metadata/            Required normalization statistics
 sample_data/         One compact, full-size LR/HR example
 scripts/evaluation/  Metrics and visualization workflows
 scripts/inference/   HDF5 prediction workflow
-scripts/training/    RRDN training and RRDN-GAN fine-tuning
+scripts/training/    RRDN training and MW-SR-GAN fine-tuning
 github_case/          Raw ATMS SDR/GEO example for map generation
 src/                  Canonical importable Python package
 tests/                Fast tests and optional release-checkpoint tests
@@ -221,7 +221,7 @@ github_case/orig.png
 
 The current example writes the output figure into the `github_case/` folder so it stays next to the raw-data demonstration script.
 
-This raw ATMS example is useful for visual inspection and for understanding how ATMS swath data are organized. It is not the same as the model prediction pipeline. To run the released RRDN or RRDN-GAN model, first prepare a model-ready HDF5 file containing a compatible brightness-temperature dataset, then use `scripts/inference/make_prediction.py`.
+This raw ATMS example is useful for visual inspection and for understanding how ATMS swath data are organized. It is not the same as the model prediction pipeline. To run the released MW-SR or MW-SR-GAN model, first prepare a model-ready HDF5 file containing a compatible brightness-temperature dataset, then use `scripts/inference/make_prediction.py`.
 
 ## Evaluation and plots
 
@@ -277,15 +277,15 @@ The following figures summarize the current research experiments. They are inclu
 | RRDN 9rrdb (MAE, 5 conv) | 3.6802 | 0.1512 | 0.8818 | 34.4566 |
 | RRDN 9rrdb (Composite SSIM alpha=0.2) | 3.8439 | 0.1288 | 0.8767 | 34.0881 |
 | RRDN 9rrdb (Composite SSIM alpha=0.5) | 3.8327 | -0.0221 | 0.8773 | 34.0962 |
-| RRDN 9rrdb (Composite SSIM alpha=0.8) | 3.3685 | 0.0222 | 0.8991 | 35.2978 |
+| MW-SR | 3.3685 | 0.0222 | 0.8991 | 35.2978 |
 | RRDN 3rrdb (Total Physics) | 3.8226 | 0.0303 | 0.8750 | 34.1189 |
 | RRDN 5rrdb (Total Physics) | 3.7809 | 0.0888 | 0.8773 | 34.2399 |
 | RRDN 7rrdb (Total Physics) | 3.8796 | 0.1015 | 0.8739 | 33.9972 |
 | RRDN 9rrdb (Total Physics) | 3.6519 | 0.1077 | 0.8815 | 34.5343 |
 | RRDN 11rrdb (Total Physics) | 3.8114 | 0.0100 | 0.8752 | 34.1412 |
 | RRDN 20rrdb (Total Physics) | 3.8642 | 0.0575 | 0.8736 | 34.0288 |
-| RRDN-GAN 9rrdb (No BatchNorm) | 3.1521 | **0.0087** | 0.9050 | 35.8073 |
-| RRDN-GAN 9rrdb (With BatchNorm) | **3.1057** | 0.0733 | **0.9072** | **35.9081** |
+| MW-SR-GAN (No BatchNorm ablation) | 3.1521 | **0.0087** | 0.9050 | 35.8073 |
+| MW-SR-GAN | **3.1057** | 0.0733 | **0.9072** | **35.9081** |
 
 #### Standard HDF5 evaluation set performance
 
@@ -295,27 +295,27 @@ The following figures summarize the current research experiments. They are inclu
 | RRDN 9rrdb (MAE, 5 conv) | 3.7622 | 0.0533 | 0.8638 | 34.4185 |
 | RRDN 9rrdb (Composite SSIM alpha=0.2) | 3.9255 | 0.1083 | 0.8583 | 34.0570 |
 | RRDN 9rrdb (Composite SSIM alpha=0.5) | 3.9351 | -0.0773 | 0.8586 | 34.0281 |
-| RRDN 9rrdb (Composite SSIM alpha=0.8) | 3.4219 | -0.0230 | 0.8835 | 35.2625 |
+| MW-SR | 3.4219 | -0.0230 | 0.8835 | 35.2625 |
 | RRDN 3rrdb (Total Physics) | 3.9155 | -0.0444 | 0.8564 | 34.0669 |
 | RRDN 5rrdb (Total Physics) | 3.9136 | 0.0122 | 0.8578 | 34.1296 |
 | RRDN 7rrdb (Total Physics) | 4.0036 | 0.0211 | 0.8543 | 33.9050 |
 | RRDN 9rrdb (Total Physics) | 3.7732 | 0.0542 | 0.8626 | 34.4249 |
 | RRDN 11rrdb (Total Physics) | 3.9279 | -0.0343 | 0.8555 | 34.0494 |
 | RRDN 20rrdb (Total Physics) | 3.9616 | -0.0457 | 0.8549 | 33.9725 |
-| RRDN-GAN 9rrdb (No BatchNorm) | 3.2596 | **0.0506** | 0.8902 | 35.6568 |
-| RRDN-GAN 9rrdb (With BatchNorm) | **3.2213** | 0.1183 | **0.8914** | **35.7417** |
+| MW-SR-GAN (No BatchNorm ablation) | 3.2596 | **0.0506** | 0.8902 | 35.6568 |
+| MW-SR-GAN | **3.2213** | 0.1183 | **0.8914** | **35.7417** |
 
 RMSE is computed globally by pooling all pixels from all scenes into one error array and calculating one RMSE value. Bias is also computed globally by pooling every pixel from every scene and averaging the signed error. SSIM is computed per scene and then averaged across scenes. PSNR is computed globally from the same global MSE value.
 
-Across both evaluation sets, the RRDN-GAN variants produce the strongest RMSE, SSIM, and PSNR results. The Composite SSIM alpha=0.8 model is the strongest non-GAN model, while increasing RRDB depth or adding the current total-physics loss does not consistently improve reconstruction.
+Across both evaluation sets, MW-SR-GAN variants produce the strongest RMSE, SSIM, and PSNR results. MW-SR is the strongest non-GAN model, while increasing RRDB depth or adding the current total-physics loss does not consistently improve reconstruction.
 
 ### Reconstruction and residuals
 
-![Low-resolution input, bilinear interpolation, RRDN-GAN prediction, and high-resolution truth for a hurricane scene](docs/figures/LR_Prediction_Truth.png)
+![Low-resolution input, bilinear interpolation, MW-SR-GAN prediction, and high-resolution truth for a hurricane scene](docs/figures/LR_Prediction_Truth.png)
 
-This paired hurricane example compares the original LR input, bilinear interpolation, the RRDN-GAN reconstruction, and the aligned HR target. The enlarged region shows where the learned model restores sharper eyewall and rainband organization than interpolation alone.
+This paired hurricane example compares the original LR input, bilinear interpolation, the MW-SR-GAN reconstruction, and the aligned HR target. The enlarged region shows where the learned model restores sharper eyewall and rainband organization than interpolation alone.
 
-![Composite SSIM and RRDN-GAN reconstructions with residual maps and pixel-error distributions](docs/figures/Image_Reconstruction_Residual_of_Models.png)
+![MW-SR and MW-SR-GAN reconstructions with residual maps and pixel-error distributions](docs/figures/Image_Reconstruction_Residual_of_Models.png)
 
 Residual maps show `truth - prediction` in Kelvin and make spatially organized errors visible. In this scene, adversarial refinement reduces the displayed error spread relative to the Composite SSIM model while preserving sharper storm structure. A strong visual result should still be read together with RMSE, bias, PSNR, and SSIM because sharper output is not automatically more physically correct.
 
@@ -325,16 +325,16 @@ Residual maps show `truth - prediction` in Kelvin and make spatially organized e
 
 Radially averaged power spectral density (PSD) measures how spatial variability is distributed across frequency scales. Lower frequency indices correspond to broad thermal patterns; higher indices correspond to finer changes such as cloud edges and storm boundaries. The GAN curves remain closer to the ground-truth spectrum through more of the middle- and high-frequency range than the reconstruction-only models, supporting the interpretation that patch-based adversarial refinement preserves additional local structure.
 
-All models still under-represent the highest-frequency power. This remaining spectral gap is an important limitation: the LR input does not uniquely encode every missing HR feature, and neither Composite SSIM nor the current physics-inspired loss fully resolves that information bottleneck.
+All models still under-represent the highest-frequency power. This remaining spectral gap is an important limitation: the LR input does not uniquely encode every missing HR feature, and neither MW-SR nor the current physics-inspired loss fully resolves that information bottleneck.
 
 ### Operational storm examples
 
 <p align="center">
-  <img src="docs/figures/Super_Typhoon_Sinlaku.png" width="47%" alt="Original ATMS brightness-temperature field and RRDN-GAN prediction for Super Typhoon Sinlaku">
-  <img src="docs/figures/Tropical_Cyclone_Develop_Case.png" width="37%" alt="VIIRS context, original ATMS field, and RRDN-GAN prediction for a developing tropical cyclone">
+  <img src="docs/figures/Super_Typhoon_Sinlaku.png" width="47%" alt="Original ATMS brightness-temperature field and MW-SR-GAN prediction for Super Typhoon Sinlaku">
+  <img src="docs/figures/Tropical_Cyclone_Develop_Case.png" width="37%" alt="VIIRS context, original ATMS field, and MW-SR-GAN prediction for a developing tropical cyclone">
 </p>
 
-These ATMS examples test inference on meteorologically important scenes outside the paired AMSR2 evaluation set. The Super Typhoon Sinlaku comparison shows the original ATMS field and its RRDN-GAN output; the developing-cyclone example adds VIIRS imagery as contextual reference. Because these cases do not have aligned HR BT targets, they support qualitative inspection only and are not used to claim quantitative reconstruction accuracy.
+These ATMS examples test inference on meteorologically important scenes outside the paired AMSR2 evaluation set. The Super Typhoon Sinlaku comparison shows the original ATMS field and its MW-SR-GAN output; the developing-cyclone example adds VIIRS imagery as contextual reference. Because these cases do not have aligned HR BT targets, they support qualitative inspection only and are not used to claim quantitative reconstruction accuracy.
 
 ## Training from scratch
 
