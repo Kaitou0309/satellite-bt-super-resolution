@@ -23,27 +23,27 @@ This repository is organized for three levels of users.
 
 Start here if you mainly want to run the released model on satellite brightness-temperature HDF5 files and inspect the output. This path is intended for scientists and collaborators who may not need the full RRDN/GAN theory to use the model productively.
 
-- Folder: `beginner_guide/`
-- Notebook: `beginner_guide/notebooks/01_use_pretrained_keras_models.ipynb`
-- Raw ATMS example: `github_case/`
+- Folder: [beginner_guide/](beginner_guide/)
+- Notebook: [beginner_guide/notebooks/01_use_pretrained_keras_models.ipynb](beginner_guide/notebooks/01_use_pretrained_keras_models.ipynb)
+- Raw ATMS example: [github_case/](github_case/)
 - Recommended artifact: `.keras`
 - Typical users: applied satellite scientists, NOAA/NASA/research collaborators, meteorology teams, and first-time repository users.
-- Covered workflow: load model, read AMSR2/ATMS/Tomorrow.io-style HDF5 inputs, run prediction, inspect LR and predicted HR output.
-- Use `github_case/` when starting from raw ATMS SDR/GEO swath files rather than prepared model-input HDF5 files.
+- Covered workflow: load model, read AMSR2/ATMS-style HDF5 inputs, run prediction, inspect LR and predicted HR output.
+- Use [github_case/](github_case/) when starting from raw ATMS SDR/GEO swath files rather than prepared model-input HDF5 files.
 
 ### 2. ML-aware model understanding
 
 Use this path if you are comfortable with machine-learning concepts and want to understand the model architecture, losses, validation metrics, and qualitative behavior.
 
-- Folders: `docs/`, `configs/`, `scripts/evaluation/`, `src/mw_super_resolution/models/`
+- Folders: [docs/](docs/), [configs/](configs/), [scripts/evaluation/](scripts/evaluation/), [src/mw_super_resolution/models/](src/mw_super_resolution/models/)
 - Covered topics: RDN/RRDN/RRDB generator design, PatchGAN-style discriminator, Composite SSIM, GAN refinement, residual plots, PSD behavior, and quantitative metrics.
-- Best starting points: the architecture figures below, `MODEL_CARD.md`, `docs/DATA.md`, and the evaluation scripts.
+- Best starting points: the architecture figures below, [MODEL_CARD.md](MODEL_CARD.md), [docs/DATA.md](docs/DATA.md), and the evaluation scripts.
 
 ### 3. Training and fine-tuning
 
 Use this path if you want to reproduce training, fine-tune the released generators, or continue training on compatible data. This path assumes you can manage Python environments, HDF5 datasets, GPU/HPC execution, and experiment tracking.
 
-- Folders: `scripts/training/`, `legacy/`, `configs/`, `metadata/`
+- Folders: [scripts/training/](scripts/training/), [legacy/](legacy/), [configs/](configs/), [metadata/](metadata/)
 - Recommended artifact: `.weights.h5` for architecture reconstruction and continued training; `.keras` for convenient inference.
 - Covered workflow: model creation, normalization, loss selection, RRDN training, GAN refinement, and checkpoint export.
 - Important note: full research datasets and experiment logs are not included in Git. Users must provide compatible training/evaluation HDF5 files and validate their own data rights.
@@ -68,25 +68,25 @@ The released MW-SR-GAN generator was trained with the BatchNorm discriminator va
 
 ## Repository layout
 
-```text
-beginner_guide/     Notebook-first guide for users who just want model inference
-configs/             Release model architecture and training metadata
-docs/                Dataset documentation and selected research figures
-legacy/              Historical model-definition references
-metadata/            Required normalization statistics
-sample_data/         One compact, full-size LR/HR example
-scripts/evaluation/  Metrics and visualization workflows
-scripts/inference/   HDF5 prediction workflow
-scripts/training/    RRDN training and MW-SR-GAN fine-tuning
-github_case/          Raw ATMS SDR/GEO example for map generation
-src/                  Canonical importable Python package
-tests/                Fast tests and optional release-checkpoint tests
-tools/                HDF5, checkpoint, and sample-generation utilities
-```
+| Path | Purpose |
+| --- | --- |
+| [beginner_guide/](beginner_guide/) | Notebook-first guide for users who just want model inference |
+| [configs/](configs/) | Release model architecture and training metadata |
+| [docs/](docs/) | Dataset documentation and selected research figures |
+| [legacy/](legacy/) | Historical model-definition references |
+| [metadata/](metadata/) | Required normalization statistics |
+| [sample_data/](sample_data/) | One compact, full-size LR/HR example |
+| [scripts/evaluation/](scripts/evaluation/) | Metrics and visualization workflows |
+| [scripts/inference/](scripts/inference/) | HDF5 prediction workflow |
+| [scripts/training/](scripts/training/) | RRDN training and MW-SR-GAN fine-tuning |
+| [github_case/](github_case/) | Raw ATMS SDR/GEO example for map generation |
+| [src/](src/) | Canonical importable Python package |
+| [tests/](tests/) | Fast tests and optional release-checkpoint tests |
+| [tools/](tools/) | HDF5, checkpoint, and sample-generation utilities |
 
 Raw datasets, generated outputs, scheduler logs, and checkpoint binaries are intentionally excluded from Git history.
 
-The original Chen architecture implementations are preserved as `src/mw_super_resolution/models/rdn_chen.py` and `rrdn_chen.py`. Training calls the original `build_RRDN` function directly. The public `build_rrdn` API is only a config-name adapter around that same implementation, ensuring training and inference reconstruct an identical layer topology.
+The original Chen architecture implementations are preserved as [src/mw_super_resolution/models/rdn_chen.py](src/mw_super_resolution/models/rdn_chen.py) and [src/mw_super_resolution/models/rrdn_chen.py](src/mw_super_resolution/models/rrdn_chen.py). Training calls the original `build_RRDN` function directly. The public `build_rrdn` API is only a config-name adapter around that same implementation, ensuring training and inference reconstruct an identical layer topology.
 
 ## Installation
 
@@ -114,9 +114,9 @@ python -m pytest -m "not release"
 
 Each selected generator is distributed in two formats through GitHub Releases. Training was performed on an HPC environment that did not support saving the newer `.keras` format, so the original selected checkpoints were saved as weights-only `.weights.h5` files. Those validated checkpoints are preserved for architecture reconstruction, fine-tuning, and HPC compatibility. Equivalent `.keras` files are exported afterward for easier loading and prediction.
 
-The expected filenames and SHA-256 checksums are recorded in `configs/` and `release_assets/SHA256SUMS.txt`.
+The expected filenames and SHA-256 checksums are recorded in [configs/](configs/) and [release_assets/SHA256SUMS.txt](release_assets/SHA256SUMS.txt).
 
-Place downloaded files under `release_assets/`:
+Place downloaded files under [release_assets/](release_assets/):
 
 ```text
 release_assets/bt-sr-rrdn-9rrdb-composite-ssim-a08-v0.1.0.weights.h5
@@ -186,7 +186,7 @@ python scripts/inference/make_prediction.py \
 
 The same command accepts a directory and recursively processes every `.h5` or `.hdf5` file.
 
-`make_prediction.py` copies each source HDF5 file before appending predictions, so latitude/longitude variables are preserved when they exist in the source file. Prediction datasets record whether matching geolocation fields were available for plotting.
+[scripts/inference/make_prediction.py](scripts/inference/make_prediction.py) copies each source HDF5 file before appending predictions, so latitude/longitude variables are preserved when they exist in the source file. Prediction datasets record whether matching geolocation fields were available for plotting.
 
 Use the complete `.keras` models instead of reconstructed weights:
 
@@ -202,7 +202,7 @@ python scripts/inference/make_prediction.py \
 
 ## Raw ATMS GitHub case
 
-The `github_case/` folder is a beginner-facing raw-data example. It is separate from `scripts/inference/make_prediction.py` because it starts one step earlier in the workflow: raw ATMS SDR and geolocation files instead of model-ready HDF5 input.
+The [github_case/](github_case/) folder is a beginner-facing raw-data example. It is separate from [scripts/inference/make_prediction.py](scripts/inference/make_prediction.py) because it starts one step earlier in the workflow: raw ATMS SDR and geolocation files instead of model-ready HDF5 input.
 
 Use this example when you have paired raw files such as:
 
@@ -223,9 +223,9 @@ The script reads the SDR brightness-temperature array, applies the ATMS scale fa
 github_case/orig.png
 ```
 
-The current example writes the output figure into the `github_case/` folder so it stays next to the raw-data demonstration script.
+The current example writes the output figure into the [github_case/](github_case/) folder so it stays next to the raw-data demonstration script.
 
-This raw ATMS example is useful for visual inspection and for understanding how ATMS swath data are organized. It is not the same as the model prediction pipeline. To run the released MW-SR or MW-SR-GAN model, first prepare a model-ready HDF5 file containing a compatible brightness-temperature dataset, then use `scripts/inference/make_prediction.py`.
+This raw ATMS example is useful for visual inspection and for understanding how ATMS swath data are organized. It is not the same as the model prediction pipeline. To run the released MW-SR or MW-SR-GAN model, first prepare a model-ready HDF5 file containing a compatible brightness-temperature dataset, then use [scripts/inference/make_prediction.py](scripts/inference/make_prediction.py).
 
 ## Evaluation and plots
 
@@ -239,9 +239,9 @@ python scripts/evaluation/metrics.py \
     --strict
 ```
 
-`metrics.py` reports numerical performance and writes the metrics table/summary plot. It does not create a prediction HDF5 file.
+[scripts/evaluation/metrics.py](scripts/evaluation/metrics.py) reports numerical performance and writes the metrics table/summary plot. It does not create a prediction HDF5 file.
 
-To plot saved predictions, first create the prediction file with `make_prediction.py`:
+To plot saved predictions, first create the prediction file with [scripts/inference/make_prediction.py](scripts/inference/make_prediction.py):
 
 ```bash
 python scripts/inference/make_prediction.py \
@@ -252,7 +252,7 @@ python scripts/inference/make_prediction.py \
     --strict
 ```
 
-Then call `plot_predictions.py` on that `make_prediction.py` output:
+Then call [scripts/evaluation/plot_predictions.py](scripts/evaluation/plot_predictions.py) on that [scripts/inference/make_prediction.py](scripts/inference/make_prediction.py) output:
 
 ```bash
 python scripts/evaluation/plot_predictions.py \
@@ -384,7 +384,7 @@ Users may train from scratch, fine-tune the released generators, or continue tra
 
 ## Data
 
-The included `sample_data/amsr2_example.h5` is a 388 KB software-validation example with the production shapes:
+The included [sample_data/amsr2_example.h5](sample_data/amsr2_example.h5) is a 388 KB software-validation example with the production shapes:
 
 ```text
 L/bt    (96, 100), float32, Kelvin
@@ -399,11 +399,11 @@ It is not a training dataset. The complete local `AMSR2/` collection remains out
 - Output behavior may vary with sensor geometry, season, surface type, storm structure, and training coverage.
 - Sharper structures do not guarantee physical correctness.
 - The HR training targets are physically based simulations, not direct observations from an existing high-resolution sounder.
-- Operational ATMS and Tomorrow.io examples without aligned HR targets support qualitative assessment only.
+- Operational ATMS examples without aligned HR targets support qualitative assessment only.
 
 ## License
 
-Source code and official released generator weights are licensed under the MIT License. This permits use, modification, fine-tuning, continued training, redistribution, and commercial use subject to the license and notices. See `LICENSE`, `NOTICE`, and `MODEL_LICENSE.md`.
+Source code and official released generator weights are licensed under the MIT License. This permits use, modification, fine-tuning, continued training, redistribution, and commercial use subject to the license and notices. See [LICENSE](LICENSE), [NOTICE](NOTICE), and [MODEL_LICENSE.md](MODEL_LICENSE.md).
 
 Third-party and full research datasets retain their respective terms and are not relicensed by this repository.
 
@@ -420,4 +420,4 @@ If this software supports your work, please cite the repository:
 }
 ```
 
-The same software metadata is available in `CITATION.cff`. Formal manuscript and dataset citations will be added when public identifiers are assigned.
+The same software metadata is available in [CITATION.cff](CITATION.cff). Formal manuscript and dataset citations will be added when public identifiers are assigned.

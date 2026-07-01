@@ -22,7 +22,6 @@ The notebook demonstrates the same workflow for:
 - `sample_data/amsr2_example.h5`, the small public paired example included in Git.
 - `AMSR2/`, if you have the larger local AMSR2 collection.
 - `ATMS/`, if you have ATMS HDF5 files prepared with a compatible `bt` dataset.
-- `tomorrow.io.new/`, if you have Tomorrow.io-style HDF5 files prepared with a compatible `bt` dataset.
 
 Only the small AMSR2 example is intended to be committed to Git. Larger local sensor collections should remain outside Git history and can be referenced by path when running the notebook locally.
 
