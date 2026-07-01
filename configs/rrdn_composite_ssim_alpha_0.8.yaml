@@ -31,4 +31,4 @@ keras_model:
   sha256: 0c38e38080d79ee0019c0fb3d92c2fa46032d22891e69bf38f86dafec6a68e6c
 
 normalization:
-  stats_file: metadata/unified_global_stats.npz
+  stats_file: metadata/unified_global_stats.json

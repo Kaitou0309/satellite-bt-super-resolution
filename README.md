@@ -344,7 +344,7 @@ Training data must contain batched `L/bt` and `H/bt` datasets. Server-specific p
 python scripts/training/train_rrdn.py \
     --train_path /path/to/training_data.h5 \
     --eval_path /path/to/evaluation_data.h5 \
-    --stats_path metadata/unified_global_stats.npz \
+    --stats_path metadata/unified_global_stats.json \
     --loss_fn composite_ssim \
     --ssim_alpha 0.8
 ```
@@ -356,7 +356,7 @@ If `--eval_path` is omitted, 20 percent of the training data is reserved for val
 ```bash
 python scripts/training/train_gan.py \
     --train_path /path/to/training_data.h5 \
-    --stats_path metadata/unified_global_stats.npz \
+    --stats_path metadata/unified_global_stats.json \
     --pretrained_generator_path /path/to/pretrained.weights.h5 \
     --use_batchnorm_d
 ```
@@ -384,7 +384,7 @@ It is not a training dataset. The complete local `AMSR2/` collection remains out
 
 ## License
 
-Source code and official released generator weights are publicly available under the PolyForm Noncommercial License 1.0.0. This permits noncommercial research, education, evaluation, inference, modification, fine-tuning, continued training, and redistribution subject to the license and notices. Commercial use is not permitted without prior written permission from the copyright holders. See `LICENSE`, `NOTICE`, and `MODEL_LICENSE.md`.
+Source code and official released generator weights are licensed under the MIT License. This permits use, modification, fine-tuning, continued training, redistribution, and commercial use subject to the license and notices. See `LICENSE`, `NOTICE`, and `MODEL_LICENSE.md`.
 
 Third-party and full research datasets retain their respective terms and are not relicensed by this repository.
 

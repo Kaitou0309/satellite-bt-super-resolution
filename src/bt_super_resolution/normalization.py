@@ -1,6 +1,7 @@
 """Normalization metadata and array transformations."""
 
 from dataclasses import dataclass
+import json
 from pathlib import Path
 
 import numpy as np
@@ -19,17 +20,23 @@ def load_normalization_stats(path: str | Path) -> NormalizationStats:
     stats_path = Path(path).expanduser().resolve()
     if not stats_path.is_file():
         raise FileNotFoundError(f"Normalization statistics not found: {stats_path}")
-    with np.load(stats_path) as data:
-        missing = [key for key in ("mu_X", "sd_X", "mu_Y", "sd_Y") if key not in data]
-        if missing:
-            raise KeyError(f"Missing normalization values {missing} in {stats_path}")
-        stats = NormalizationStats(
-            mu_x=float(data["mu_X"]),
-            sd_x=float(data["sd_X"]),
-            mu_y=float(data["mu_Y"]),
-            sd_y=float(data["sd_Y"]),
-            path=stats_path,
-        )
+    if stats_path.suffix.lower() == ".json":
+        with stats_path.open("r", encoding="utf-8") as handle:
+            data = json.load(handle)
+    else:
+        with np.load(stats_path) as npz_data:
+            data = {key: npz_data[key] for key in npz_data.files}
+
+    missing = [key for key in ("mu_X", "sd_X", "mu_Y", "sd_Y") if key not in data]
+    if missing:
+        raise KeyError(f"Missing normalization values {missing} in {stats_path}")
+    stats = NormalizationStats(
+        mu_x=float(data["mu_X"]),
+        sd_x=float(data["sd_X"]),
+        mu_y=float(data["mu_Y"]),
+        sd_y=float(data["sd_Y"]),
+        path=stats_path,
+    )
     if stats.sd_x <= 0 or stats.sd_y <= 0:
         raise ValueError(f"Normalization standard deviations must be positive: {stats_path}")
     return stats

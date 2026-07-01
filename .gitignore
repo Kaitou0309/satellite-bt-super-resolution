@@ -40,3 +40,5 @@ release_assets/*
 
 # Keep the small normalization metadata required for inference.
 !metadata/unified_global_stats.npz
+tomorrow.io.new/
+tomorrow.io.new/

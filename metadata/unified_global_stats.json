@@ -1,0 +1,13 @@
+{
+  "mu_X": 254.31916732924577,
+  "sd_X": 25.372157438490554,
+  "mu_Y": 254.29851878186292,
+  "sd_Y": 25.65757680623149,
+  "scale_h": 4,
+  "scale_w": 4,
+  "train_path": "/scratch/zt1/project/wlikun-prj/shared/kchen137/combined_data/training_data.h5",
+  "used_files": 1,
+  "skipped_files": 0,
+  "count_X": 114057600,
+  "count_Y": 1824921600
+}

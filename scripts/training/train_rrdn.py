@@ -19,6 +19,7 @@ if str(SOURCE_ROOT) not in sys.path:
     sys.path.insert(0, str(SOURCE_ROOT))
 
 from bt_super_resolution.models import build_RRDN
+from bt_super_resolution.normalization import load_normalization_stats
 
 # Handle multi-GPU if available
 strategy = tf.distribute.MirroredStrategy()
@@ -168,7 +169,7 @@ def parse_args():
     parser.add_argument(
         "--stats_path",
         type=str,
-        default="metadata/unified_global_stats.npz",
+        default="metadata/unified_global_stats.json",
         help="Normalization statistics created for the training dataset."
     )
     parser.add_argument(
@@ -244,11 +245,9 @@ def main():
     scale_w = Y_train.shape[2] // X_train.shape[2]
     print(f"📏 Detected Scaling Factor: {scale_h}x{scale_w}")
 
-    if not os.path.isfile(args.stats_path):
-        raise FileNotFoundError(f"Normalization statistics not found: {args.stats_path}")
-    with np.load(args.stats_path) as s:
-        MU_X, SD_X = float(s["mu_X"]), float(s["sd_X"])
-        MU_Y, SD_Y = float(s["mu_Y"]), float(s["sd_Y"])
+    stats = load_normalization_stats(args.stats_path)
+    MU_X, SD_X = stats.mu_x, stats.sd_x
+    MU_Y, SD_Y = stats.mu_y, stats.sd_y
 
     print("⚙️ Normalizing Data...")
     X_train = np.nan_to_num((X_train - MU_X) / (SD_X + 1e-8))

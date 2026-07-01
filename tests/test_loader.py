@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 
 import numpy as np
 import yaml
@@ -22,7 +23,10 @@ def test_config_driven_loader_and_kelvin_prediction(tmp_path: Path) -> None:
 
     metadata_dir = tmp_path / "metadata"
     metadata_dir.mkdir()
-    np.savez(metadata_dir / "stats.npz", mu_X=250.0, sd_X=30.0, mu_Y=250.0, sd_Y=30.0)
+    (metadata_dir / "stats.json").write_text(
+        json.dumps({"mu_X": 250.0, "sd_X": 30.0, "mu_Y": 250.0, "sd_Y": 30.0}),
+        encoding="utf-8",
+    )
 
     config = {
         "name": "tiny_test_rrdn",
@@ -38,7 +42,7 @@ def test_config_driven_loader_and_kelvin_prediction(tmp_path: Path) -> None:
             "residual_scaling": 0.2,
             "upsampling": "bilinear",
         },
-        "normalization": {"stats_file": "metadata/stats.npz"},
+        "normalization": {"stats_file": "metadata/stats.json"},
         "weights": {"filename": weights_path.name, "sha256": "TODO"},
     }
     config_path = tmp_path / "model.yaml"

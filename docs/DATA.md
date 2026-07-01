@@ -32,7 +32,7 @@ Research files may additionally contain latitude and longitude fields. The publi
 
 ## Normalization
 
-The selected checkpoints require the statistics in `metadata/unified_global_stats.npz`:
+The selected checkpoints require the statistics in `metadata/unified_global_stats.json`:
 
 ```text
 mu_X, sd_X    LR mean and standard deviation

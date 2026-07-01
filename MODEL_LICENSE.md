@@ -1,16 +1,14 @@
 # Model Weight License
 
-The official MW-SR and MW-SR-GAN generator weights distributed through this project's official releases are licensed under the PolyForm Noncommercial License 1.0.0 in the repository `LICENSE` file.
+The official MW-SR and MW-SR-GAN generator weights distributed through this project's official releases are licensed under the MIT License in the repository `LICENSE` file.
 
-Subject to that license, users may use the released model weights for noncommercial purposes, including:
+Subject to that license, users may:
 
-- running the existing models for inference;
-- reproducing and evaluating the models;
-- fine-tuning or continuing training the weights on compatible user data;
-- creating modified model weights and derivative models; and
-- redistributing original or modified weights while complying with the license and retaining applicable notices.
-
-Commercial use is not permitted without prior written permission from the copyright holders.
+- run the existing models for inference;
+- reproduce and evaluate the models;
+- fine-tune or continue training the weights on compatible user data;
+- create modified model weights and derivative models; and
+- redistribute original or modified weights while complying with the license and retaining applicable notices.
 
 The weights are provided without warranties or guarantees of fitness for operational forecasting, safety-critical decisions, or scientific conclusions. Users are responsible for validating models on their own sensors, regions, seasons, and use cases.
 

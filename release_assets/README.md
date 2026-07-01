@@ -9,7 +9,7 @@ This directory is for local review of model binaries before they are uploaded to
 
 The HPC training environment did not support the newer `.keras` format, so both selected models were originally stored as weights-only `.weights.h5` checkpoints. Keep those original checkpoints for reproducible architecture reconstruction, fine-tuning, and HPC compatibility. The corresponding `.keras` exports package each generator architecture with its weights for easier loading and prediction. Discriminator weights are not required for inference.
 
-The `.keras` exports contain the complete Functional generator architecture, generator weights, and Keras serialization metadata. They are inference-focused and do not contain compile configuration, optimizer state, training losses or metrics, external normalization statistics, YAML metadata, the GAN discriminator, datasets, or training history. Keep the config and `metadata/unified_global_stats.npz` with the model release workflow.
+The `.keras` exports contain the complete Functional generator architecture, generator weights, and Keras serialization metadata. They are inference-focused and do not contain compile configuration, optimizer state, training losses or metrics, external normalization statistics, YAML metadata, the GAN discriminator, datasets, or training history. Keep the config and `metadata/unified_global_stats.json` with the model release workflow.
 
 Upload all four ignored model files and `SHA256SUMS.txt` to a versioned GitHub Release. Do not force-add model binaries to Git history.
 

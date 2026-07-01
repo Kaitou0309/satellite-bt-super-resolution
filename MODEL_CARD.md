@@ -29,7 +29,7 @@ The `.keras` files contain the Functional generator graph and weights, but not n
 ## Required companion artifacts
 
 - Exact RRDN architecture configuration.
-- `metadata/unified_global_stats.npz`.
+- `metadata/unified_global_stats.json`.
 - TensorFlow/Keras environment information.
 - Checkpoint checksum.
 - A tested inference script.
@@ -42,4 +42,4 @@ The public example is intended for software validation only. Full scientific ben
 
 ## Training and modification
 
-The official weights may be used directly, fine-tuned, or continued on compatible user data for noncommercial purposes under `MODEL_LICENSE.md`. Users must recompute or deliberately validate normalization statistics when changing sensors or datasets.
+The official weights may be used directly, fine-tuned, or continued on compatible user data under `MODEL_LICENSE.md`. Users must recompute or deliberately validate normalization statistics when changing sensors or datasets.
