@@ -13,13 +13,11 @@ The intended audience includes satellite scientists, operational meteorology res
 
 Open:
 
-```text
-beginner_guide/notebooks/01_use_pretrained_keras_models.ipynb
-```
+[notebooks/01_use_pretrained_keras_models.ipynb](notebooks/01_use_pretrained_keras_models.ipynb)
 
 The notebook demonstrates the same workflow for:
 
-- `sample_data/amsr2_example.h5`, the small public paired example included in Git.
+- [sample_data/amsr2_example.h5](../sample_data/amsr2_example.h5), the small public paired example included in Git.
 - `AMSR2/`, if you have the larger local AMSR2 collection.
 - `ATMS/`, if you have ATMS HDF5 files prepared with a compatible `bt` dataset.
 
@@ -27,13 +25,13 @@ Only the small AMSR2 example is intended to be committed to Git. Larger local se
 
 ## Model Format Used Here
 
-The beginner workflow uses the `.keras` model artifacts because they are easiest to load for prediction. The repository loader still applies the required Kelvin normalization and denormalization metadata from `configs/` and `metadata/`.
+The beginner workflow uses the `.keras` model artifacts because they are easiest to load for prediction. The repository loader still applies the required Kelvin normalization and denormalization metadata from [configs/](../configs/) and [metadata/](../metadata/).
 
 ## When To Use Other Folders
 
-- Use `scripts/evaluation/` when you want command-line metrics or batch plotting.
-- Use `docs/` when you want architecture and data documentation.
-- Use `scripts/training/` only when you are ready to train, fine-tune, or continue training models.
+- Use [scripts/evaluation/](../scripts/evaluation/) when you want command-line metrics or batch plotting.
+- Use [docs/](../docs/) when you want architecture and data documentation.
+- Use [scripts/training/](../scripts/training/) only when you are ready to train, fine-tune, or continue training models.
 
 ## Notes
 
